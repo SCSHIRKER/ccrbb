@@ -37,7 +37,7 @@
 ### 部署步骤
 
 1. **准备代码**：
-   - 复制 `index.js` 的所有内容到剪贴板
+   - 复制 `worker.js` 的所有内容到剪贴板
 
 2. **登录 Cloudflare Dashboard**：
    - 访问 [https://dash.cloudflare.com](https://dash.cloudflare.com)
@@ -54,7 +54,7 @@
    - 部署完成后，你会看到 Worker 的概览页面
    - 点击 "Edit code" 按钮进入代码编辑器
    - **重要**：选中并删除编辑器中的所有默认代码
-   - 粘贴从 `index.js` 复制的完整代码
+   - 粘贴从 `worker.js` 复制的完整代码
    - 点击右上角的 "Save and deploy" 按钮
 
 5. **设置环境变量**：
@@ -117,7 +117,7 @@
 
 ## 自定义配置
 
-可以通过修改 `index.js` 中的以下设置来自定义机器人行为：
+可以通过修改 `worker.js` 中的以下设置来自定义机器人行为：
 
 - **警告消息文本**：修改 `CONFIG.WARNING_MESSAGE_TEXT` 常量
 - **自动删除超时**：修改 `CONFIG.WARNING_AUTO_DELETE_DELAY` 常量
