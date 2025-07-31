@@ -5,8 +5,8 @@
  * where it has admin permissions. It distinguishes between linked channel replies
  * (allowed) and external channel replies (blocked).
  * 
- * @version 2.0.0
- * @author Bot Developer
+ * @version 1.0.0
+ * @author Shirker
  * @license MIT
  */
 
