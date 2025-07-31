@@ -6,7 +6,7 @@
  * (allowed) and external channel replies (blocked).
  * 
  * @version 1.0.0
- * @author Shirker
+ * @author SCSHIRKER
  * @license MIT
  */
 
@@ -234,8 +234,15 @@ async function handleMessage(message, env, ctx, isEdited = false) {
       return;
     }
 
-    // Only process group and supergroup messages
     const chatType = message.chat.type;
+    
+    // Handle private chat messages (only /start command)
+    if (chatType === 'private') {
+      await handlePrivateMessage(message, env);
+      return;
+    }
+    
+    // Only process group and supergroup messages for cross-channel reply blocking
     if (chatType !== 'group' && chatType !== 'supergroup') {
       console.debug(`🔍 Ignoring ${chatType} message (ID: ${message.message_id})`);
       return;
@@ -264,6 +271,72 @@ async function handleMessage(message, env, ctx, isEdited = false) {
   } catch (error) {
     console.error(`❌ Error handling message ${message?.message_id}:`, error);
     // Continue processing other messages even if one fails
+  }
+}
+
+/**
+ * Handle private chat messages (mainly /start command)
+ * @param {Object} message - Telegram message object
+ * @param {Object} env - Environment variables
+ * @returns {Promise<void>}
+ */
+async function handlePrivateMessage(message, env) {
+  try {
+    // Check if message has text
+    if (!message.text) {
+      console.debug(`🔍 Ignoring private message without text (ID: ${message.message_id})`);
+      return;
+    }
+
+    const messageText = message.text.trim();
+    
+    // Handle /start command
+    if (messageText === '/start' || messageText.startsWith('/start ')) {
+      console.log(`🎯 Handling /start command from user ${message.from.id} (${message.from.username || message.from.first_name})`);
+      
+      const startMessage = `🤖 跨频道回复拦截机器人
+
+📋 **功能说明**
+本机器人可以自动删除 Telegram 群组中的跨频道回复消息，区分已关联频道（允许）和外部频道（禁止）。
+
+🔧 **使用方法**
+• 将机器人拉进群组
+• 设置为管理员并给予"删除消息"和"发送消息"权限
+• 无需任何其他配置，机器人自动开始工作
+
+📖 **开源仓库**
+https://github.com/SCSHIRKER/ccrbb
+
+👨‍💻 **作者**
+@as24400
+
+💡 **原理**
+机器人会自动区分关联频道回复（允许）和外部频道回复（删除并警告）。`;
+
+      await makeApiRequest('sendMessage', {
+        chat_id: message.chat.id,
+        text: startMessage,
+        parse_mode: 'Markdown',
+        disable_web_page_preview: true
+      }, env);
+      
+      console.log(`✅ Sent start message to user ${message.from.id}`);
+    } else {
+      // For other commands or text, send a brief help message
+      console.debug(`🔍 Ignoring non-start command in private chat: ${messageText}`);
+      
+      const helpMessage = `❓ 请发送 /start 查看使用说明
+
+或者直接将我添加到群组中并设为管理员即可开始使用。`;
+
+      await makeApiRequest('sendMessage', {
+        chat_id: message.chat.id,
+        text: helpMessage
+      }, env);
+    }
+    
+  } catch (error) {
+    console.error(`❌ Error handling private message ${message?.message_id}:`, error);
   }
 }
 
